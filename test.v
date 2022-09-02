@@ -31,9 +31,6 @@ repeat(3) @(posedge clk);
 rst<=0;
 repeat(3) @(posedge clk);
 rst<=1;
-
 end
-
-#20 $finish
 
 endmodule
