@@ -2,12 +2,14 @@ module counter_tb;
 reg clk;
 wire [7:0] count;
 reg rst;
+reg enable;
 
 //////////////////////////////////////
 //conection to counter
 //////////////////////////////////////
 counter c0(.clk(clk),
 .count(count),
+.enable(enable),
 .rst(rst));
 
 
@@ -24,6 +26,8 @@ always #1 clk=~clk;
 initial begin
 clk<=0;
 rst<=0;
+
+enable<=0;
 
 repeat(3) @(posedge clk);
 rst<=1;
