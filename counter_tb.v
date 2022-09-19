@@ -6,26 +6,60 @@ module counter_tb;
 //////////////////////////
 //      PARAMETERS          
 //////////////////////////
-parameter WIDTHX=8;
+parameter WIDTH=8;
+parameter INC_SIZE=1;
+parameter DEC_SIZE=1;
 
 
 //////////////////////////
 //      REG & WIRE
 //////////////////////////
-reg                 clk;
-wire [WIDTHX-1:0]   count;
-reg                 rst;
-reg                 inc;
+reg                     clk;
+wire [WIDTH-1:0]        count;
+reg                     rst_n;
+reg  [INC_SIZE-1:0]     inc;
+reg  [DEC_SIZE-1:0]     dec;
 
 
 //////////////////////
 //      DUT
 //////////////////////
-counter #(.WIDTH(WIDTHX)) c0(
+counter #(
+.WIDTH(WIDTH),
+.INC_SIZE(INC_SIZE),
+.DEC_SIZE(DEC_SIZE)) c0(
 .clk(clk),
 .count(count),
 .inc(inc),
-.rst(rst));
+.dec(dec),
+.rst_n(rst_n));
+
+///////////////////////////
+//      CHECKER
+///////////////////////////
+initial begin @(posedge rst_n)
+repeat(10) @(posedge clk);
+inc={INC_SIZE{1'b1}};
+repeat((2**WIDTH)-1) @(posedge clk);
+inc='0;
+repeat(5) @(posedge clk);
+if(((2**WIDTH)-1)==count) $display("PASS");
+else $display("FAIL");
+repeat(5) @(posedge clk);
+inc={INC_SIZE{1'b1}};
+repeat(1) @(posedge clk);
+inc='0;
+repeat(1) @(posedge clk);
+dec={DEC_SIZE{1'b1}};
+repeat((2**WIDTH)-1) @(posedge clk);
+dec='0;
+repeat(5) @(posedge clk);
+if(((2**WIDTH)-1)==count) $display("PASS");
+else $display("FAIL");
+repeat(5) @(posedge clk);
+$finish;
+end
+
 
 
 ///////////////////////////
@@ -39,7 +73,7 @@ always #1 clk=~clk;
 /////////////////////////////////////////
 initial begin
 clk=0;
-rst=0;
+rst_n=0;
 end
 
 //////////////////////////
@@ -47,27 +81,11 @@ end
 //////////////////////////
 initial begin
 repeat(3) @(posedge clk);
-rst=1;
+rst_n=1;
 repeat(3) @(posedge clk);
-rst=0;
+rst_n=0;
 repeat(3) @(posedge clk);
-rst=1;
-end
-
-
-///////////////////////////
-//      CHECKER
-///////////////////////////
-initial begin
-repeat(10) @(posedge clk);
-inc=1;
-repeat({WIDTHX{1'b1}}) @(posedge clk);
-inc=0;
-repeat(5) @(posedge clk);
-if({WIDTHX{1'b1}}==count) $display("PASS");
-else $display("FAIL");
-repeat(5) @(posedge clk);
-$finish;
+rst_n=1;
 end
 
 
